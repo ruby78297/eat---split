@@ -136,14 +136,14 @@ function Friend({
 
       {friend.balance < 0 && (
         <p className="red">
-          You owe {friend.name} ₹
-          {Math.abs(friend.balance)}
+          You owe {friend.name}{" "}
+          {Math.abs(friend.balance)}€
         </p>
       )}
       {friend.balance > 0 && (
         <p className="green">
-          {friend.name} owes you ₹
-          {Math.abs(friend.balance)}
+          {friend.name} owes you{" "}
+          {Math.abs(friend.balance)}€
         </p>
       )}
       {friend.balance === 0 && (
@@ -212,20 +212,26 @@ function FormSplitBill({
 }) {
   const [bill, setBill] = useState("");
   const [paidByUser, setPaidByUser] = useState("");
-  const paidByFriend = bill ? bill - paidByUser : "";
   const [whoIsPaying, setWhoIsPaying] = useState(
     "user"
   );
+
+  const paidByFriend = bill ? bill - paidByUser : "";
 
   function handleSubmit(e) {
     e.preventDefault();
 
     if (!bill || !paidByUser) return;
-    onSplitBill(
+
+    const splitValue =
       whoIsPaying === "user"
         ? paidByFriend
-        : -paidByUser
-    );
+        : -paidByUser;
+
+    onSplitBill(Number(splitValue));
+
+    setBill("");
+    setPaidByUser("");
   }
 
   return (
@@ -237,7 +243,7 @@ function FormSplitBill({
 
       <label>💰 Bill value</label>
       <input
-        type="text"
+        type="number"
         value={bill}
         onChange={(e) =>
           setBill(Number(e.target.value))
@@ -246,20 +252,18 @@ function FormSplitBill({
 
       <label>🧍‍♀️ Your expense</label>
       <input
-        type="text"
+        type="number"
         value={paidByUser}
         onChange={(e) =>
           setPaidByUser(
-            Number(e.target.value) > bill
-              ? paidByUser
-              : Number(e.target.value)
+            Math.min(Number(e.target.value), bill)
           )
         }
       />
 
       <label>👫 {selectedFriend.name}'s expense</label>
       <input
-        type="text"
+        type="number"
         disabled
         value={paidByFriend}
       />
